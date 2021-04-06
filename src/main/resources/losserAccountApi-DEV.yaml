@@ -1,0 +1,6 @@
+db:
+  host: "localhost"
+  port: "3306"
+  userName: "ram"
+  password: "Rmsi@252012345"
+  schema: "integration"

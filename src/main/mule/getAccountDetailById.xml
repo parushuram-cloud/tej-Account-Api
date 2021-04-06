@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getAccountDetailByIdFlow" doc:id="3a9fde40-7c74-42ae-8bc1-88d04bf5b0e7" >
+		<logger level="INFO" doc:name="Logger" doc:id="d5687b3c-6c6d-44a0-a9bb-677e58520b50" message="recieved the request"/>
+		<db:select doc:name="Select" doc:id="239b1565-e06c-4d0e-9a89-31eafced7432" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *  from Account where accountId = :accId]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	accId:attributes.uriParams.accountId
+}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="8751369c-5b3a-479f-af1d-b4047c97277a" >
+			<when expression="#[sizeOf(payload)&gt;0]">
+				<ee:transform doc:name="Transform Message" doc:id="4b4e401d-1b33-4721-89f8-ebc9680c52a5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="32d8d226-ca9d-4b4c-97c4-e07829ec569c" type="ACC:ACCOUNT_ID_NOT_FOUND" description="Account is Invalid please select correct Id"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="ea249028-2dfb-4290-9232-3629cc7c5352" message="final response from DB"/>
+	</flow>
+</mule>

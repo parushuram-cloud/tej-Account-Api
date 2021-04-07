@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="deleteAccountByIdFlow" doc:id="72b85356-5e9c-4487-8e1d-b68527b904ac" >
+		<logger level="INFO" doc:name="Logger" doc:id="bd1c29b9-195d-47cf-83dd-24a4181f829d" message="flow starts"/>
+		<db:delete doc:name="Delete" doc:id="0f69a1d3-ff09-4089-86af-aee82a647f0d" config-ref="Database_Config">
+			<db:sql ><![CDATA[Delete  from Account  where accountId=:accId]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	accId: attributes.uriParams.accountId
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="eb65cf7b-9820-4d16-a82c-020f7d2b3df6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "account deleted success"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="79c25dce-6b31-452d-86c2-5008848e0f57" message="final response fro Db"/>
+	</flow>
+</mule>
